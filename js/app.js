@@ -189,6 +189,10 @@ function resetAll() {
   updatePenStatus();
 }
 
+function recenterView() {
+  simulator.recenterView();
+}
+
 // ─── UI update helpers ────────────────────────────────────────────────────────
 
 function updateButtons() {
@@ -228,6 +232,7 @@ function applyTranslations(lang) {
   document.getElementById('run-btn').textContent     = t.run;
   document.getElementById('pause-btn').textContent   = t.pause;
   document.getElementById('reset-btn').textContent   = t.reset;
+  document.getElementById('recenter-btn').textContent = t.recenter;
   document.getElementById('lang-btn').textContent    = t.lang_toggle;
   document.getElementById('pseudo-title').textContent = t.pseudocode_title;
   document.getElementById('speed-label').textContent = t.speed;
@@ -325,6 +330,7 @@ function init() {
   document.getElementById('run-btn').addEventListener('click', onRun);
   document.getElementById('pause-btn').addEventListener('click', togglePause);
   document.getElementById('reset-btn').addEventListener('click', resetAll);
+  document.getElementById('recenter-btn').addEventListener('click', recenterView);
   document.getElementById('lang-btn').addEventListener('click', toggleLanguage);
 
   // Blockly SVG resize on window resize

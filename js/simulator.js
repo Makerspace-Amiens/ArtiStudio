@@ -2,10 +2,20 @@ class Simulator {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    this.scale = 2;       // px per mm
+    this.baseScale = 2;   // px per mm
+    this.scale = this.baseScale;
     this.gridMm = 10;     // mm between minor grid lines
     this.traceColor = '#00395c'; // bleu corporate UniLaSalle
     this.robotColor = '#dc3428'; // rouge Amiens
+    this.viewX = 0;
+    this.viewY = 0;
+    this.isPanning = false;
+    this.panPointerId = null;
+    this.lastPointerX = 0;
+    this.lastPointerY = 0;
+    this.minScale = 0.4;
+    this.maxScale = 8;
+    this._bindInteractions();
     this.reset();
   }
 
@@ -19,18 +29,79 @@ class Simulator {
     this.render();
   }
 
+  recenterView() {
+    this.viewX = 0;
+    this.viewY = 0;
+    this.scale = this.baseScale;
+    this.render();
+  }
+
   worldToCanvas(wx, wy) {
     return [
-      this.canvas.width / 2 + wx * this.scale,
-      this.canvas.height / 2 - wy * this.scale,
+      this.canvas.width / 2 + (wx - this.viewX) * this.scale,
+      this.canvas.height / 2 - (wy - this.viewY) * this.scale,
     ];
   }
 
   canvasToWorld(cx, cy) {
     return [
-      (cx - this.canvas.width / 2) / this.scale,
-      (this.canvas.height / 2 - cy) / this.scale,
+      this.viewX + (cx - this.canvas.width / 2) / this.scale,
+      this.viewY + (this.canvas.height / 2 - cy) / this.scale,
     ];
+  }
+
+  _bindInteractions() {
+    this.canvas.style.touchAction = 'none';
+    this.canvas.addEventListener('pointerdown', (event) => this._onPointerDown(event));
+    this.canvas.addEventListener('pointermove', (event) => this._onPointerMove(event));
+    this.canvas.addEventListener('pointerup', (event) => this._endPan(event));
+    this.canvas.addEventListener('pointercancel', (event) => this._endPan(event));
+    this.canvas.addEventListener('wheel', (event) => this._onWheel(event), { passive: false });
+  }
+
+  _onPointerDown(event) {
+    if (event.button !== 0 && event.pointerType !== 'touch') return;
+    this.isPanning = true;
+    this.panPointerId = event.pointerId;
+    this.lastPointerX = event.offsetX;
+    this.lastPointerY = event.offsetY;
+    this.canvas.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  }
+
+  _onPointerMove(event) {
+    if (!this.isPanning || event.pointerId !== this.panPointerId) return;
+    const dx = event.offsetX - this.lastPointerX;
+    const dy = event.offsetY - this.lastPointerY;
+    this.lastPointerX = event.offsetX;
+    this.lastPointerY = event.offsetY;
+    this.viewX -= dx / this.scale;
+    this.viewY += dy / this.scale;
+    this.render();
+    event.preventDefault();
+  }
+
+  _endPan(event) {
+    if (event.pointerId !== this.panPointerId) return;
+    if (this.canvas.hasPointerCapture(event.pointerId)) {
+      this.canvas.releasePointerCapture(event.pointerId);
+    }
+    this.isPanning = false;
+    this.panPointerId = null;
+  }
+
+  _onWheel(event) {
+    event.preventDefault();
+    const zoomFactor = event.deltaY < 0 ? 1.12 : 1 / 1.12;
+    const nextScale = Math.min(this.maxScale, Math.max(this.minScale, this.scale * zoomFactor));
+    if (nextScale === this.scale) return;
+
+    const [worldXBefore, worldYBefore] = this.canvasToWorld(event.offsetX, event.offsetY);
+    this.scale = nextScale;
+    const [worldXAfter, worldYAfter] = this.canvasToWorld(event.offsetX, event.offsetY);
+    this.viewX += worldXBefore - worldXAfter;
+    this.viewY += worldYBefore - worldYAfter;
+    this.render();
   }
 
   drawGrid() {
@@ -38,8 +109,7 @@ class Simulator {
     const w = canvas.width;
     const h = canvas.height;
     const gsPx = gridMm * scale;
-    const cx = w / 2;
-    const cy = h / 2;
+    const [cx, cy] = this.worldToCanvas(0, 0);
 
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, w, h);
@@ -48,8 +118,8 @@ class Simulator {
     const drawLines = (axis) => {
       const total = axis === 'x' ? w : h;
       const center = axis === 'x' ? cx : cy;
-      const startOffset = center % gsPx;
-      let idx = -Math.floor(center / gsPx);
+      const startOffset = ((center % gsPx) + gsPx) % gsPx;
+      let idx = -Math.floor((center - startOffset) / gsPx);
 
       for (let px = startOffset; px <= total; px += gsPx, idx++) {
         const isMajor = idx % 5 === 0;
@@ -88,15 +158,23 @@ class Simulator {
     ctx.font = '9px sans-serif';
     ctx.textAlign = 'center';
     const labelMm = gridMm * 5;
-    const labelPx = labelMm * scale;
-    for (let wx = -Math.ceil(w / 2 / labelPx) * labelMm; wx <= w / (2 * scale); wx += labelMm) {
+    const worldLeft = this.canvasToWorld(0, h / 2)[0];
+    const worldRight = this.canvasToWorld(w, h / 2)[0];
+    const worldBottom = this.canvasToWorld(w / 2, h)[1];
+    const worldTop = this.canvasToWorld(w / 2, 0)[1];
+    const startX = Math.ceil(worldLeft / labelMm) * labelMm;
+    const endX = Math.floor(worldRight / labelMm) * labelMm;
+    const startY = Math.ceil(worldBottom / labelMm) * labelMm;
+    const endY = Math.floor(worldTop / labelMm) * labelMm;
+
+    for (let wx = startX; wx <= endX; wx += labelMm) {
       if (wx === 0) continue;
       const [px] = this.worldToCanvas(wx, 0);
       if (px < 5 || px > w - 5) continue;
       ctx.fillText(wx, px, cy + 12);
     }
     ctx.textAlign = 'right';
-    for (let wy = -Math.ceil(h / 2 / labelPx) * labelMm; wy <= h / (2 * scale); wy += labelMm) {
+    for (let wy = startY; wy <= endY; wy += labelMm) {
       if (wy === 0) continue;
       const [, py] = this.worldToCanvas(0, wy);
       if (py < 5 || py > h - 5) continue;

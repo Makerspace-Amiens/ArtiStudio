@@ -313,7 +313,10 @@ main {
   display: block;
   width: 100%;
   height: 100%;
+  cursor: grab;
 }
+
+#sim-canvas:active { cursor: grabbing; }
 
 /* ─── Barre de contrôles ──────────────────────────────────────── */
 
@@ -370,6 +373,13 @@ main {
   border: 1.5px solid var(--border);
 }
 #reset-btn:hover { background: #ede9e4; }
+
+#recenter-btn {
+  background: var(--accent-light);
+  color: var(--secondary);
+  border: 1.5px solid rgba(132,185,38,.35);
+}
+#recenter-btn:hover { background: #e2efbe; }
 
 /* Séparateur */
 .ctrl-sep {
