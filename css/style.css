@@ -1,0 +1,502 @@
+/* ArtiStudio — Charte graphique UniLaSalle Amiens */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─── Palette UniLaSalle Amiens ───────────────────────────────
+   Source : Charte graphique UniLaSalle 2023
+   Campus Amiens  → rouge PANTONE RED 032C  #dc3428
+   Corporate bleu → PANTONE 2955C           #00395c
+   Vert ULS       → PANTONE 368C            #84b926
+   Blanc                                    #ffffff
+   ────────────────────────────────────────────────────────── */
+
+:root {
+  /* Campus Amiens */
+  --primary:        #dc3428;
+  --primary-dark:   #b52821;
+  --primary-light:  #fde8e7;   /* ~30 % tint rouge Amiens */
+
+  /* Corporate UniLaSalle */
+  --secondary:      #00395c;
+  --secondary-dark: #002840;
+  --secondary-light:#d6e6f0;
+
+  /* Vert institutionnel */
+  --accent:         #84b926;
+  --accent-light:   #eef6d6;
+
+  /* UI neutres */
+  --surface:        #ffffff;
+  --bg:             #f7f4f0;   /* fond chaud neutre */
+  --border:         #e2ddd8;
+  --text:           #1a1715;   /* quasi-noir typographique */
+  --text-muted:     #6b6560;
+
+  /* Layout */
+  --header-h:       64px;
+  --controls-h:     72px;
+  --radius:         8px;
+  --shadow:         0 2px 12px rgba(0,0,0,.08);
+
+  /* Typo — Nunito (Google Fonts, officiel ULS secondaire)
+            Barlow Condensed (substitut web de Diazo MVB Cond Bold) */
+  --font-display: 'Barlow Condensed', 'Impact', sans-serif;
+  --font-body:    'Nunito', 'Verdana', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ─── Header ─────────────────────────────────────────────────── */
+
+header {
+  height: var(--header-h);
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 16px;
+  box-shadow: 0 3px 10px rgba(183,40,33,.35);
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* Bloc marque UniLaSalle Amiens */
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.uls-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+  line-height: 1;
+}
+
+.uls-uni {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 1.1rem;
+  color: #fff;
+  letter-spacing: 0;
+}
+
+.uls-lasalle {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.uls-arrow {
+  font-size: .85rem;
+  color: rgba(255,255,255,.85);
+  margin-left: 2px;
+  font-weight: 700;
+}
+
+.uls-sub {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.uls-campus {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: .72rem;
+  color: rgba(255,255,255,.9);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+}
+
+.uls-tagline {
+  font-family: var(--font-display);
+  font-size: .62rem;
+  color: rgba(255,255,255,.55);
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+
+.uls-tagline strong {
+  color: rgba(255,255,255,.85);
+  font-weight: 800;
+}
+
+/* Séparateur vertical header */
+.header-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(255,255,255,.25);
+  margin: 0 14px;
+  flex-shrink: 0;
+}
+
+/* Nom de l'app */
+.header-app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 14px;
+}
+
+#app-title {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+#app-subtitle {
+  font-size: .67rem;
+  font-weight: 400;
+  color: rgba(255,255,255,.6);
+  margin-top: 1px;
+}
+
+/* Sélecteur de niveaux */
+.header-levels {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.level-btn {
+  background: rgba(255,255,255,.1);
+  border: 1.5px solid rgba(255,255,255,.22);
+  border-radius: var(--radius);
+  padding: 5px 14px;
+  cursor: pointer;
+  color: rgba(255,255,255,.75);
+  transition: all .15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.25;
+  min-width: 88px;
+  font-family: var(--font-body);
+}
+
+.level-btn:hover {
+  background: rgba(255,255,255,.2);
+  color: #fff;
+  border-color: rgba(255,255,255,.45);
+}
+
+.level-btn.active {
+  background: rgba(255,255,255,.22);
+  border-color: #fff;
+  color: #fff;
+}
+
+.level-num  { font-size: .68rem; opacity: .8; font-weight: 400; }
+.level-name { font-size: .8rem; font-weight: 700; }
+
+/* Bouton langue */
+#lang-btn {
+  background: var(--secondary);
+  border: none;
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .9rem;
+  cursor: pointer;
+  letter-spacing: .8px;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+
+#lang-btn:hover { background: var(--secondary-dark); }
+
+/* ─── Layout ─────────────────────────────────────────────────── */
+
+main {
+  display: flex;
+  height: calc(100vh - var(--header-h));
+}
+
+/* ─── Panneau éditeur (gauche) ────────────────────────────────── */
+
+#editor-panel {
+  display: flex;
+  flex-direction: column;
+  width: 52%;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+}
+
+#blockly-div {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Panneau pseudo-code */
+#code-panel {
+  flex-shrink: 0;
+  height: 160px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: var(--secondary);  /* bleu corporate UniLaSalle */
+}
+
+.code-panel-header {
+  padding: 5px 14px;
+  background: var(--secondary-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.code-panel-arrow {
+  color: var(--accent);  /* flèche verte UniLaSalle */
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+#pseudo-title {
+  font-family: var(--font-display);
+  font-size: .72rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.55);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#pseudo-code {
+  flex: 1;
+  overflow: auto;
+  padding: 10px 14px;
+  font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+  font-size: .82rem;
+  line-height: 1.7;
+  color: var(--accent);  /* vert UniLaSalle sur fond bleu corporate */
+  white-space: pre;
+  background: transparent;
+}
+
+/* ─── Panneau simulateur (droite) ────────────────────────────── */
+
+#simulator-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+#canvas-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+#sim-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── Barre de contrôles ──────────────────────────────────────── */
+
+#controls {
+  flex-shrink: 0;
+  height: var(--controls-h);
+  border-top: 2px solid var(--primary-light);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,.04);
+}
+
+.ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 18px;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: .88rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+
+.ctrl-btn:disabled {
+  opacity: .38;
+  cursor: not-allowed;
+}
+
+/* Exécuter — bleu corporate UniLaSalle */
+#run-btn {
+  background: var(--secondary);
+  color: #fff;
+}
+#run-btn:not(:disabled):hover { background: var(--secondary-dark); }
+
+/* Pause — rouge Amiens (action principale campus) */
+#pause-btn {
+  background: var(--primary);
+  color: #fff;
+}
+#pause-btn:not(:disabled):hover { background: var(--primary-dark); }
+
+/* Réinitialiser — neutre */
+#reset-btn {
+  background: var(--bg);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+#reset-btn:hover { background: #ede9e4; }
+
+/* Séparateur */
+.ctrl-sep {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* Groupe label + contrôle */
+.ctrl-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ctrl-label {
+  font-size: .75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#exec-mode {
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 8px;
+  font-family: var(--font-body);
+  font-size: .82rem;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+}
+#exec-mode:focus { border-color: var(--primary); }
+
+/* Slider vitesse */
+#speed-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 90px;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--secondary) 0%, var(--secondary) 50%, var(--border) 50%);
+  outline: none;
+  cursor: pointer;
+}
+#speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--secondary);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  cursor: pointer;
+}
+#speed-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--secondary);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  cursor: pointer;
+}
+
+/* Indicateur stylo */
+.pen-indicator {
+  margin-left: auto;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: .75rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Stylo baissé → bleu corporate */
+.pen-down {
+  background: var(--secondary-light);
+  color: var(--secondary);
+}
+
+/* Stylo levé → rouge Amiens clair */
+.pen-up {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.pen-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.pen-down::before { background: var(--secondary); }
+.pen-up::before   { background: var(--primary); }
+
+/* ─── Overrides Blockly ───────────────────────────────────────── */
+
+.blocklyToolboxDiv {
+  background: #faf8f5 !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+.blocklyTreeRow { border-radius: 5px !important; }
+.blocklyTreeRow:hover { background: var(--primary-light) !important; }
+.blocklyTreeSelected { background: var(--primary) !important; }
+.blocklyTreeLabel {
+  font-family: var(--font-body) !important;
+  font-weight: 700 !important;
+  font-size: .84rem !important;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  main { flex-direction: column; }
+  #editor-panel { width: 100%; height: 55%; }
+  #simulator-panel { height: 45%; }
+  #code-panel { height: 110px; }
+  #controls { gap: 6px; padding: 0 8px; overflow-x: auto; }
+  .header-divider, .uls-tagline { display: none; }
+  .header-app { margin-right: 8px; }
+}
