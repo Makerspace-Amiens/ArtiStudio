@@ -8,6 +8,55 @@ let paused = false;
 let animTimer = null;
 let animQueue = [];
 let animIndex = 0;
+const PROGRAM_COOKIE_NAME = 'artistudio_program';
+const PROGRAM_COOKIE_DAYS = 30;
+
+function setCookie(name, value, days) {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function getCookie(name) {
+  const prefix = `${name}=`;
+  for (const part of document.cookie.split(';')) {
+    const cookie = part.trim();
+    if (cookie.startsWith(prefix)) return cookie.slice(prefix.length);
+  }
+  return '';
+}
+
+function getSavedProgramState() {
+  const raw = getCookie(PROGRAM_COOKIE_NAME);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(decodeURIComponent(raw));
+  } catch (_) {
+    return null;
+  }
+}
+
+function persistProgramState() {
+  if (!workspace) return;
+
+  try {
+    const xml = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace));
+    const payload = encodeURIComponent(JSON.stringify({
+      level: currentLevel,
+      lang: currentLang,
+      xml,
+    }));
+    setCookie(PROGRAM_COOKIE_NAME, payload, PROGRAM_COOKIE_DAYS);
+  } catch (_) {}
+}
+
+function restoreSavedPreferences() {
+  const savedState = getSavedProgramState();
+  if (!savedState) return;
+
+  if ([1, 2, 3].includes(savedState.level)) currentLevel = savedState.level;
+  if (savedState.lang === 'fr' || savedState.lang === 'en') currentLang = savedState.lang;
+}
 
 // ─── Toolbox ─────────────────────────────────────────────────────────────────
 
@@ -67,7 +116,17 @@ function applyBlocklyMessages(lang) {
 
 
 function initBlockly(lang, level) {
-  const savedXml = workspace ? Blockly.Xml.workspaceToDom(workspace) : null;
+  let savedXml = workspace ? Blockly.Xml.workspaceToDom(workspace) : null;
+  if (!savedXml) {
+    const savedState = getSavedProgramState();
+    if (savedState && savedState.xml) {
+      try {
+        savedXml = Blockly.Xml.textToDom(savedState.xml);
+      } catch (_) {
+        savedXml = null;
+      }
+    }
+  }
 
   if (workspace) {
     workspace.dispose();
@@ -92,8 +151,10 @@ function initBlockly(lang, level) {
     try { Blockly.Xml.domToWorkspace(savedXml, workspace); } catch (_) {}
   }
 
-  workspace.addChangeListener(() => {
+  workspace.addChangeListener((event) => {
+    if (event && event.isUiEvent) return;
     updatePseudoCode();
+    persistProgramState();
   });
 }
 
@@ -316,6 +377,7 @@ function setupCanvasResize() {
 function init() {
   defineArtiBotBlocks();
   initJsGenerators();
+  restoreSavedPreferences();
 
   const canvas = document.getElementById('sim-canvas');
   simulator = new Simulator(canvas);
@@ -323,7 +385,9 @@ function init() {
 
   // Level buttons
   document.querySelectorAll('.level-btn').forEach(btn => {
-    btn.addEventListener('click', () => setLevel(parseInt(btn.dataset.level, 10)));
+    const level = parseInt(btn.dataset.level, 10);
+    btn.classList.toggle('active', level === currentLevel);
+    btn.addEventListener('click', () => setLevel(level));
   });
 
   // Control buttons
